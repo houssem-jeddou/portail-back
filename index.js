@@ -11,6 +11,7 @@ const express = require('express'); //express is a function
 const users = require('./routes/users');
 const auth = require('./routes/auth');
 const publication = require('./routes/publication');
+const universities = require('./routes/universities');
 
 
 //caughting unhandleded exceptions for synch code:
@@ -61,6 +62,7 @@ app.use(helmet());//to log requests
 app.use('/api/users', users)
 app.use('/api/auth', auth)
 app.use('/api/publication', publication)
+app.use('/api/uni', universities)
 
 app.use(error)
 
