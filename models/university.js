@@ -10,6 +10,7 @@ const University = mongoose.model('University', universitySchema)
 
 
 function validateUniversity(university) {
+    console.log('t')
     const schema = {
         name: Joi.string().min(3).required(),
         // localisation: Joi.string().min(3).required(),
