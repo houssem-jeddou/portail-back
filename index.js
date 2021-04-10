@@ -13,6 +13,7 @@ const auth = require('./routes/auth');
 const publication = require('./routes/publication');
 const universities = require('./routes/universities');
 const section = require('./routes/section');
+const comment = require('./routes/comments');
 
 
 //caughting unhandleded exceptions for synch code:
@@ -65,6 +66,7 @@ app.use('/api/auth', auth)
 app.use('/api/publication', publication)
 app.use('/api/uni', universities)
 app.use('/api/section', section)
+app.use('/api/comment', comment)
 
 app.use(error)
 
