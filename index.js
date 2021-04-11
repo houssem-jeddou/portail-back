@@ -51,7 +51,7 @@ if (!config.get("jwtPrivateKey")) {
 
 const mongoose = require('mongoose')
 
-mongoose.connect('mongodb+srv://root:root@cluster0.dync6.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
+mongoose.connect('mongodb+srv://portail:portail@cluster0.xdstu.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
     { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('Connexion à MongoDB réussie !'))
     .catch(() => console.log('Connexion à MongoDB échouée !'));
