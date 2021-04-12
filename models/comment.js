@@ -7,10 +7,9 @@ const { PubSchema } = require('./publications');
 const commentSchema = mongoose.Schema({
     content: { type: String, required: true, minlength: 3, maxlength: 255, trim: true },
     date: { type: Date, required: true },
-    ///pub: { type: mongoose.Schema.Types.ObjectId, ref: 'Publication' },
+    author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    publication: { type: mongoose.Schema.Types.ObjectId, ref: 'Publication', required: true },
 
-    //user: userSchema,
-    //publication: PubSchema,
 })
 
 const Comment = mongoose.model('Comment', commentSchema)
@@ -19,6 +18,9 @@ const Comment = mongoose.model('Comment', commentSchema)
 function validateComment(comment) {
     const schema = {
         content: Joi.string().min(3).required(),
+        author: Joi.string().min(3).required(),
+        publication: Joi.string().min(3).required(),
+
         // pubId: Joi.objectId().required(),
         // userId: Joi.objectId().required(),
     }

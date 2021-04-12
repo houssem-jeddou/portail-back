@@ -11,6 +11,9 @@ const userSchema = mongoose.Schema({
     sectionBac: { type: String, required: true, minlength: 3, maxlength: 50, trim: true },
     scoreBac: { type: Number, required: true, },
     password: { type: String, required: true, minlength: 5, maxlength: 1024, trim: true },
+    publications: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Publication' }],
+    comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }]
+
     // email: { type: String, required: true, minlength: 5, maxlength: 255, trim: true, unique: true },
     // isAdmin: Boolean,
     // section: sectionSchema
