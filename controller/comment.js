@@ -15,24 +15,23 @@ exports.CreateComment = async (req, res) => {
     if (error)
         return res.status(400).send(error.details[0].message)
 
-    // const user = await User.findById(req.body.userId)
-    // if (!user) return res.status(400).send('Invalid user')
+    const author = await User.findById(req.body.author);
+    if (!author) return res.status(400).send('Invalid author.');
 
-    // const publication = await Publication.findById(req.body.pubId)
-    // if (!publication) return res.status(400).send('Invalid publication')
+    const publication = await Publication.findById(req.body.publication)
+    if (!publication) return res.status(400).send('Invalid publication')
 
     const comment = new Comment({
         content: req.body.content,
         date: new Date(),
-        // user: {
-        //     name: user.name,
-        //     _id: user._id,
-        // },
-        // publication: {
-        //     texte: publication.texte,
-        //     _id: publication._id
-        // }
+        author: author._id,
+        publication: publication._id,
     })
+
+    author.comments.push(publication);
+    publication.comments.push(publication);
+    await author.save();
+    await publication.save();
     await comment.save();
     res.send(comment);
 }
@@ -70,19 +69,29 @@ exports.UpdateComment = (req, res, next) => async (req, res) => {
 }
 
 exports.DeleteComment = async (req, res) => {
-    const comment = await Comment.findByIdAndRemove(req.params.id)
+    const comment = await Comment
+        .findByIdAndRemove(req.params.id)
+        .populate("author")
+        .populate("publication")
     if (!comment) return res.status(404).send('NOT FOUND ')//404
 
     res.send(comment)
 }
 
 exports.GetoneComment = async (req, res) => {
-    const comment = Comment.findById(req.params.id)
+    const comment = Comment
+        .findById(req.params.id)
+        .populate("author")
+        .populate("publication")
     if (!comment) return res.status(404).send('NOT FOUND ')//404
     res.send(comment);
 }
 
 exports.GetallComment = async (req, res) => {
-    const comments = await Comment.find().sort('date')
+    const comments = await Comment
+        .find()
+        .populate("author")
+        .populate("publication")
+        .sort('date')
     res.send(comments)
 }
