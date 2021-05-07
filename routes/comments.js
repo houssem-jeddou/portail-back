@@ -6,7 +6,7 @@ const admin = require('../middleware/admin');
 
 router.get('/', Comment.GetallComment);
 
-router.post('/', auth, Comment.CreateComment);
+router.post('/', Comment.CreateComment);
 
 router.put('/:id', Comment.UpdateComment);
 
