@@ -11,9 +11,10 @@ const express = require('express'); //express is a function
 const users = require('./routes/users');
 const auth = require('./routes/auth');
 const publication = require('./routes/publication');
-const universities = require('./routes/universities');
+const universities = require('./routes/universities')
 const section = require('./routes/section');
 const comment = require('./routes/comments');
+const formation = require('./routes/formation');
 
 
 //caughting unhandleded exceptions for synch code:
@@ -67,6 +68,8 @@ app.use('/api/publication', publication)
 app.use('/api/uni', universities)
 app.use('/api/section', section)
 app.use('/api/comment', comment)
+app.use('/api/formation', formation)
+
 
 app.use(error)
 

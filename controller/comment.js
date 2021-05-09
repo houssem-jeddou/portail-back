@@ -28,15 +28,13 @@ exports.CreateComment = async (req, res) => {
         publication: publication._id,
     })
 
-    author.comments.push(publication);
-    publication.comments.push(publication);
-    await author.save();
+    publication.comments.push(comment);
     await publication.save();
     await comment.save();
     res.send(comment);
 }
 
-exports.UpdateComment = (req, res, next) => async (req, res) => {
+exports.UpdateComment = async (req, res) => {
     const { error } = validateComment(req.body);
     if (error) return res.status(400).send(error.details[0].message)
 
@@ -50,16 +48,8 @@ exports.UpdateComment = (req, res, next) => async (req, res) => {
     const comment = await Comment.findByIdAndUpdate(req.params.id, {
         content: req.body.content,
         date: new Date(),
-        // user: {
-        //     name: user.name,
-        //     _id: user._id
-        // },
-        // publication: {
-        //     texte: publication.texte,
-        //     _id: publication._id
-        // }
-        //nested doc
-        //user: { name: String, age: Number }
+        author: author._id,
+        publication: publication._id,
     },
         { new: true })
     //look up the Comment 
@@ -71,18 +61,23 @@ exports.UpdateComment = (req, res, next) => async (req, res) => {
 exports.DeleteComment = async (req, res) => {
     const comment = await Comment
         .findByIdAndRemove(req.params.id)
-        .populate("author")
-        .populate("publication")
+        .select('-__v')
+        .populate('author', '-password -scoreBac -sectionBac -publications -__v ')
+        .populate('publication', '-__v ')
+
+
     if (!comment) return res.status(404).send('NOT FOUND ')//404
 
     res.send(comment)
 }
 
 exports.GetoneComment = async (req, res) => {
-    const comment = Comment
+    const comment = await Comment
         .findById(req.params.id)
-        .populate("author")
-        .populate("publication")
+        .select('-__v')
+        .populate('author', '-password -scoreBac -sectionBac -publications -__v ')
+        .populate('publication', '-__v -date -author -comments')
+
     if (!comment) return res.status(404).send('NOT FOUND ')//404
     res.send(comment);
 }
@@ -90,8 +85,9 @@ exports.GetoneComment = async (req, res) => {
 exports.GetallComment = async (req, res) => {
     const comments = await Comment
         .find()
-        .populate("author")
-        .populate("publication")
+        .select('-__v')
+        .populate('author', '-password -scoreBac -sectionBac -publications -__v ')
+        .populate('publication', '-__v ')
         .sort('date')
     res.send(comments)
 }

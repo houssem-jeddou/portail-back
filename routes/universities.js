@@ -6,14 +6,14 @@ const admin = require('../middleware/admin');
 
 router.get('/', Uni.GetallUni);
 
-router.post('/', auth, Uni.CreateUni)
+router.post('/', Uni.CreateUni)
 
 router.put('/:id', Uni.UpdateUni)
 
 
 router.get('/:id', Uni.GetoneUni)
 
-router.delete('/:id', [auth, admin], Uni.DeleteUni)
+router.delete('/:id', Uni.DeleteUni)
 
 
 module.exports = router;

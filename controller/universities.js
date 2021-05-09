@@ -3,34 +3,80 @@ const auth = require('../middleware/auth')
 const admin = require('../middleware/admin')
 const express = require('express');
 const router = express.Router();
-
 const mongoose = require('mongoose')
-const { validateUniversity, University } = require('../models/university')
+const { validateUniversity, University } = require('../models/university');
+const { Formation } = require('../models/formation');
+
 
 exports.CreateUni = async (req, res) => {
-    //input validation using joi 
     const { error } = validateUniversity(req.body);
     if (error)
         return res.status(400).send(error.details[0].message)
 
+    const c = [];
+    for (let i = 0; i < req.body.uniChoix.length; i++) {
+        const e = req.body.uniChoix[i];
+        const formation = await Formation.findById(e.uniFormation)
+            .then((result) => {
+                if (!result) {
+                    return res.status(400).send('Invalid formation.');
+                }
+                console.log("result  : ", result._id);
+                c.push({
+                    uniFormation: result._id,
+                    uniScore: e.uniScore
+                })
+                return c;
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+    }
+
+    console.log("finally uniChoix = ", c)
     const university = new University({
-        name: req.body.name // we can read it thnx to the middleware
+        name: req.body.name,
+        localisation: req.body.localisation,
+        description: req.body.description,
+        uniChoix: c,
     })
     await university.save();
-    //convention: when we add a new object to the server we should return 
-    //that obj into the body of the response since the client may need its id 
     res.send(university);
 }
 
-exports.UpdateUni = (req, res, next) => async (req, res) => {
+exports.UpdateUni = async (req, res) => {
     const { error } = validateUniversity(req.body);
     if (error) return res.status(400).send(error.details[0].message)
 
-    const university = await University.findByIdAndUpdate(req.params.id, { name: req.body.name }, { new: true })
+    const c = [];
+    for (let i = 0; i < req.body.uniChoix.length; i++) {
+        const e = req.body.uniChoix[i];
+        const formation = await Formation.findById(e.uniFormation)
+            .then((result) => {
+                if (!result) {
+                    return res.status(400).send('Invalid formation.');
+                }
+                console.log("result  : ", result._id);
+                c.push({
+                    uniFormation: result._id,
+                    uniScore: e.uniScore
+                })
+                return c;
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+    }
+
+    const university = new University({
+        name: req.body.name,
+        localisation: req.body.localisation,
+        description: req.body.description,
+        uniChoix: c,
+    })
+
     //look up the university 
     if (!university) return res.status(404).send('NOT FOUND ')//404
-
-    //input validation using joi 
 
     res.send(university);
 }
@@ -43,13 +89,15 @@ exports.DeleteUni = async (req, res) => {
 }
 
 exports.GetoneUni = async (req, res) => {
-    const university = University.findById(req.params.id)
+    const university = await University.findById(req.params.id)
     if (!university) return res.status(404).send('NOT FOUND ')//404
     res.send(university);
 }
 
 exports.GetallUni = async (req, res) => {
-    //throw new Error('testin new erro cant find universities')
-    const universities = await University.find().sort('name')
+    const universities = await University
+        .find()
+        .sort('name')
+    //.populate("publication")
     res.send(universities)
 }
