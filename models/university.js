@@ -10,7 +10,8 @@ const universitySchema = mongoose.Schema({
     uniChoix: [{
         uniFormation: { type: mongoose.Schema.Types.ObjectId, ref: 'Formation', required: true },
         uniScore: { type: Number, required: true, }
-    }]
+    }],
+    keywords: [String]
 
 })
 
@@ -27,6 +28,7 @@ function validateUniversity(university) {
                 uniFormation: Joi.string().min(3).required(),
                 uniScore: Joi.number().min(0).required(),
             }),
+        keywords: Joi.array()
     }
     return Joi.validate(university, schema)
 }
