@@ -15,6 +15,8 @@ const universities = require('./routes/universities')
 const section = require('./routes/section');
 const comment = require('./routes/comments');
 const formation = require('./routes/formation');
+const uniPub = require('./routes/uniPub');
+var cors = require('cors')
 
 
 //caughting unhandleded exceptions for synch code:
@@ -61,6 +63,13 @@ mongoose.connect('mongodb+srv://portail:portail@cluster0.xdstu.mongodb.net/myFir
 const app = express();
 app.use(express.json());
 app.use(helmet());//to log requests 
+app.use(cors())
+
+app.all('/', function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "X-Requested-With");
+    next()
+});
 
 app.use('/api/users', users)
 app.use('/api/auth', auth)
@@ -69,6 +78,7 @@ app.use('/api/uni', universities)
 app.use('/api/section', section)
 app.use('/api/comment', comment)
 app.use('/api/formation', formation)
+app.use('/api/uniPub', uniPub)
 
 
 app.use(error)
@@ -81,7 +91,7 @@ app.use(express.json())
 //to parse json objects from tha body of the request 
 //By default this feature is not enabled by express
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
 // to change PORT:  set PORT=5000 in cmd
 app.listen(port, () => {
     console.log(port);

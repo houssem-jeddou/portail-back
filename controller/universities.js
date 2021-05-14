@@ -7,7 +7,6 @@ const mongoose = require('mongoose')
 const { validateUniversity, University } = require('../models/university');
 const { Formation } = require('../models/formation');
 
-
 exports.CreateUni = async (req, res) => {
     const { error } = validateUniversity(req.body);
     if (error)
@@ -39,6 +38,7 @@ exports.CreateUni = async (req, res) => {
         localisation: req.body.localisation,
         description: req.body.description,
         uniChoix: c,
+        keywords: req.body.keywords
     })
     await university.save();
     res.send(university);
@@ -73,6 +73,7 @@ exports.UpdateUni = async (req, res) => {
         localisation: req.body.localisation,
         description: req.body.description,
         uniChoix: c,
+        keywords: req.body.keywords
     })
 
     //look up the university 
@@ -82,14 +83,21 @@ exports.UpdateUni = async (req, res) => {
 }
 
 exports.DeleteUni = async (req, res) => {
-    const university = await University.findByIdAndRemove(req.params.id)
+    const university = await University
+        .findByIdAndRemove(req.params.id)
+        .select('-__v')
+        .populate('uniChoix.uniFormation', ' -__v ')
+
     if (!university) return res.status(404).send('NOT FOUND ')//404
 
     res.send(university)
 }
 
 exports.GetoneUni = async (req, res) => {
-    const university = await University.findById(req.params.id)
+    const university = await University
+        .findById(req.params.id)
+        .select('-__v')
+        .populate('uniChoix.uniFormation', ' -__v ')
     if (!university) return res.status(404).send('NOT FOUND ')//404
     res.send(university);
 }
@@ -97,7 +105,8 @@ exports.GetoneUni = async (req, res) => {
 exports.GetallUni = async (req, res) => {
     const universities = await University
         .find()
+        .select('-__v -uniChoix')
+        // .populate('uniChoix.uniFormation', ' -__v ')
         .sort('name')
-    //.populate("publication")
     res.send(universities)
 }

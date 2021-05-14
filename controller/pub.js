@@ -62,6 +62,12 @@ exports.GetonePublication = async (req, res) => {
         .select('-__v')
         .populate('author', '-password -scoreBac -sectionBac -publications -__v ')
         .populate('comments', '-__v ')
+        .populate({
+            path: 'comments',
+            populate: {
+                path: 'author'
+            }
+        })
 
     if (!publication) return res.status(404).send('NOT FOUND ')//404
     res.send(publication);
