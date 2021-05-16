@@ -1,29 +1,64 @@
 const express = require('express');
 const mongoose = require('mongoose')
+const url = require('url');
+var fs = require('fs');
 const { validatePub, Publication } = require('../models/publications');
 const { User } = require('../models/user');
+const MIME_TYPES = {
+    'image/jpg': 'jpg',
+    'image/jpeg': 'jpg',
+    'image/png': 'png'
+  };
+
 
 exports.CreatePublication = async (req, res) => {
     //input validation using joi 
     const { error } = validatePub(req.body);
     if (error)
         return res.status(400).send(error.details[0].message)
-
+        
     const author = await User.findById(req.body.author);
     if (!author) return res.status(400).send('Invalid author.');
-
+    if(req.files!=null){
+        var img =req.files.photo;
+        var name = img.name.split(' ').join('_');
+        name = name.replace(".","_");
+        const extension = MIME_TYPES[img.mimetype];
+        filename= name + Date.now() + '.' + extension;
+        img.mv('images/'+filename,function(err){
+          if(err) {
+            res.json({ err})
+          }else{
+          const publication = new Publication({
+            texte : req.body.texte,
+            date :req.body.date,
+            author: author._id,
+            photo:filename,
+            type:res.tag
+          });
+          author.publications.push(publication);
+          author.save();
+          publication.save();
+         // await author.save();
+          //await publication.save();
+          res.send(publication);
+          }
+        })
+      }else{
     const publication = new Publication({
         texte: req.body.texte,
-        date: new Date(),
+        date: req.body.date,
         author: author._id,
+        type:res.tag
 
     })
 
     await publication.save();
     author.publications.push(publication);
-    await author.save();
+    author.save();
+    publication.save();
     res.send(publication);
-}
+}}
 
 exports.UpdatePublication = async (req, res) => {
     const { error } = validatePub(req.body);
@@ -74,6 +109,12 @@ exports.GetonePublication = async (req, res) => {
 }
 
 exports.GetAllPublication = async (req, res) => {
+    if(req.cookies.search){
+    const filters = JSON.parse(req.cookies.search); 
+    var fil=[];
+    for (key in filters) {
+         fil.push(JSON.parse(filters[key])) 
+    }
     const publications = await Publication
         .find()
         .select('-__v')
@@ -82,3 +123,15 @@ exports.GetAllPublication = async (req, res) => {
         .sort('date')
     res.send(publications)
 }
+}
+
+exports.GetRentingPub = async (req, res) => {
+     const publications = await Publication
+         .find()
+         .populate("comments")
+         .populate("author")
+         .sort({ date: -1 })
+         const filteredPub = publications.filter(pub => pub.type=="Renting");
+     res.send(filteredPub)
+ }
+

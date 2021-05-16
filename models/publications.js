@@ -4,6 +4,8 @@ const Joi = require('joi');
 const PubSchema = mongoose.Schema({
   texte: { type: String, required: true, minlength: 3, maxlength: 255, trim: true },
   date: { type: Date, required: true },
+  photo : { type: String, required: false },
+  type : { type: String, required: false },
   author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   comments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }]
 
@@ -12,9 +14,10 @@ const PubSchema = mongoose.Schema({
 const Publication = mongoose.model('Publication', PubSchema)
 
 function validatePub(pub) {
-  const schema = {
+  const schema = { 
     texte: Joi.string().min(3).required(),
     author: Joi.string().min(3).required(),
+    date: Joi.string().min(3).required(),
   }
   return Joi.validate(pub, schema)
 }
