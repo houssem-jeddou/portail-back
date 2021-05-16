@@ -12,9 +12,9 @@ const auth = require('../middleware/auth')
 exports.Me = async (req, res) => {
     const user = await User
         .findById(req.user._id)
-        .populate("publications")
-        .populate("comments")
-        .select('-password')
+        .select('-password -__v')
+        .populate('publications', '-comments -__v -author')
+
     res.send(user)
 }
 
@@ -28,7 +28,6 @@ exports.CreateUser = async (req, res) => {
     let user = await User
         .findOne({ username: req.body.username })
         .populate("publications")
-        .populate("comments")
 
     if (user) return res.status(400).send("User already registered")
 

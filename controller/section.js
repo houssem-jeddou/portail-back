@@ -20,7 +20,7 @@ exports.CreateSection = async (req, res) => {
     res.send(section);
 }
 
-exports.UpdateSection = (req, res, next) => async (req, res) => {
+exports.UpdateSection = async (req, res) => {
     const { error } = validateSection(req.body);
     if (error) return res.status(400).send(error.details[0].message)
 
@@ -39,7 +39,7 @@ exports.DeleteSection = async (req, res) => {
 }
 
 exports.GetoneSection = async (req, res) => {
-    const section = Section.findById(req.params.id)
+    const section = await Section.findById(req.params.id)
     if (!section) return res.status(404).send('NOT FOUND ')//404
     res.send(section);
 }
